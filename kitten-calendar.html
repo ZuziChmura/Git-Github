@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 Kitten Calendar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(160deg,
+        #fce4ec 0%,
+        #f3e5f5 20%,
+        #e8eaf6 40%,
+        #e0f7fa 60%,
+        #f9fbe7 80%,
+        #fff8e1 100%
+      );
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .page-title {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #f48fb1, #ce93d8, #90caf9, #80cbc4, #a5d6a7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(1px 2px 0px rgba(200,160,200,0.4));
+    }
+
+    .page-subtitle {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #c9a0dc;
+      letter-spacing: 4px;
+      margin-bottom: 3rem;
+      text-transform: uppercase;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 2rem;
+      max-width: 1250px;
+      margin: 0 auto;
+    }
+
+    .month-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 6px 28px rgba(180, 140, 200, 0.18);
+      background: #ffffff;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .month-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 40px rgba(180, 140, 200, 0.28);
+    }
+
+    .kitten-wrap {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .kitten-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .month-card:hover .kitten-img {
+      transform: scale(1.05);
+    }
+
+    .kitten-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(to top, rgba(255,255,255,0.85), transparent);
+    }
+
+    .month-header {
+      padding: 0.9rem 1.5rem 0.5rem;
+      font-size: 1.35rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .month-divider {
+      width: 40px;
+      height: 3px;
+      border-radius: 3px;
+      margin: 0 auto 0.8rem;
+    }
+
+    .cal-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 2px;
+      padding: 0 1rem 1.2rem;
+    }
+
+    .cal-table thead th {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 4px 2px 6px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .cal-table td {
+      text-align: center;
+      padding: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      width: 36px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: default;
+    }
+
+    .cal-table td.day-num {
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .cal-table td.day-num:hover {
+      opacity: 0.8;
+    }
+
+    .paw-footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 1.6rem;
+      letter-spacing: 6px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Kitten Calendar 2026</h1>
+  <p class="page-subtitle">A whole year of adorable kittens</p>
+
+  <div class="calendar-grid" id="calendar"></div>
+
+  <div class="paw-footer">
+    <span>&#x1F43E;</span>
+    <span>&#x1F431;</span>
+    <span>&#x1F43E;</span>
+    <span>&#x1F431;</span>
+    <span>&#x1F43E;</span>
+  </div>
+
+  <script>
+    // Today's date for highlighting
+    const today = new Date();
+    const todayYear  = today.getFullYear();
+    const todayMonth = today.getMonth();
+    const todayDate  = today.getDate();
+
+    // Pastel palette per month
+    const themes = [
+      // Jan  – baby blue
+      { accent: '#89bfe8', light: '#daeeff', text: '#4a82b5', weekendCol: '#7aa9d4', todayBg: '#4a82b5' },
+      // Feb  – blush pink
+      { accent: '#f4a0b8', light: '#ffe0ea', text: '#c05878', weekendCol: '#e07898', todayBg: '#c05878' },
+      // Mar  – mint
+      { accent: '#72cca9', light: '#d4f5e9', text: '#37896b', weekendCol: '#58b48f', todayBg: '#37896b' },
+      // Apr  – butter yellow
+      { accent: '#f0d060', light: '#fffad0', text: '#a07828', weekendCol: '#c8a840', todayBg: '#a07828' },
+      // May  – soft lavender
+      { accent: '#b09ae8', light: '#ede8ff', text: '#6a4db5', weekendCol: '#9278d0', todayBg: '#6a4db5' },
+      // Jun  – peach
+      { accent: '#f5aa78', light: '#ffe8d5', text: '#b86030', weekendCol: '#e08050', todayBg: '#b86030' },
+      // Jul  – sky teal
+      { accent: '#70cccc', light: '#d8f5f5', text: '#2e8888', weekendCol: '#50b2b2', todayBg: '#2e8888' },
+      // Aug  – rose
+      { accent: '#f095b8', light: '#ffe0ee', text: '#b84878', weekendCol: '#d87098', todayBg: '#b84878' },
+      // Sep  – sage green
+      { accent: '#98d478', light: '#e4f8d8', text: '#448830', weekendCol: '#72b858', todayBg: '#448830' },
+      // Oct  – soft gold
+      { accent: '#e8c060', light: '#fff5d0', text: '#987020', weekendCol: '#c89838', todayBg: '#987020' },
+      // Nov  – lilac
+      { accent: '#c898e8', light: '#f2e0ff', text: '#8840c0', weekendCol: '#aa68d8', todayBg: '#8840c0' },
+      // Dec  – candy coral
+      { accent: '#f08080', light: '#ffe0e0', text: '#b04040', weekendCol: '#d86060', todayBg: '#b04040' },
+    ];
+
+    const monthNames = [
+      'January','February','March','April',
+      'May','June','July','August',
+      'September','October','November','December'
+    ];
+    const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+    // Unique cat image query strings for each month
+    const catSeeds = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 222, 333];
+
+    function daysInMonth(year, month) {
+      return new Date(year, month + 1, 0).getDate();
+    }
+
+    function firstDayOfMonth(year, month) {
+      return new Date(year, month, 1).getDay();
+    }
+
+    const calEl = document.getElementById('calendar');
+    const YEAR = 2026;
+
+    for (let m = 0; m < 12; m++) {
+      const t = themes[m];
+      const numDays  = daysInMonth(YEAR, m);
+      const startDay = firstDayOfMonth(YEAR, m);
+      const seed     = catSeeds[m];
+
+      // Build flat cell array (null = empty)
+      const cells = [];
+      for (let i = 0; i < startDay; i++) cells.push(null);
+      for (let d = 1; d <= numDays; d++) cells.push(d);
+      while (cells.length % 7 !== 0) cells.push(null);
+
+      // Build table rows HTML
+      let rowsHTML = '';
+      for (let i = 0; i < cells.length; i += 7) {
+        rowsHTML += '<tr>';
+        for (let j = 0; j < 7; j++) {
+          const day = cells[i + j];
+          if (!day) {
+            rowsHTML += '<td></td>';
+            continue;
+          }
+          const isToday   = (YEAR === todayYear && m === todayMonth && day === todayDate);
+          const isWeekend = (j === 0 || j === 6);
+
+          let style = '';
+          if (isToday) {
+            style = `background:${t.todayBg}; color:#fff; border-radius:50%;`;
+          } else if (isWeekend) {
+            style = `color:${t.weekendCol};`;
+          } else {
+            style = `color:${t.text};`;
+          }
+          rowsHTML += `<td class="day-num" style="${style}">${day}</td>`;
+        }
+        rowsHTML += '</tr>';
+      }
+
+      // Day header row
+      const dayHeaderHTML = dayNames.map((d, i) => {
+        const color = (i === 0 || i === 6) ? t.weekendCol : t.text;
+        return `<th style="color:${color}">${d}</th>`;
+      }).join('');
+
+      // Kitten image URL (loremflickr – reliable public API)
+      const imgUrl = `https://loremflickr.com/400/200/kitten,cat?lock=${seed}`;
+
+      const card = document.createElement('div');
+      card.className = 'month-card';
+      card.innerHTML = `
+        <div class="kitten-wrap">
+          <img
+            src="${imgUrl}"
+            alt="Cute kitten – ${monthNames[m]}"
+            class="kitten-img"
+            loading="lazy"
+          />
+          <div class="kitten-overlay"></div>
+        </div>
+        <div class="month-header" style="color:${t.text};">${monthNames[m]} ${YEAR}</div>
+        <div class="month-divider" style="background:${t.accent};"></div>
+        <table class="cal-table">
+          <thead><tr>${dayHeaderHTML}</tr></thead>
+          <tbody>${rowsHTML}</tbody>
+        </table>
+      `;
+      calEl.appendChild(card);
+    }
+  </script>
+</body>
+</html>
