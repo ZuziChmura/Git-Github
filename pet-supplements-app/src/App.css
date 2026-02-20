@@ -1,0 +1,27 @@
+/* Mobile app shell */
+.app-shell {
+  min-height: 100dvh;
+  background: #D1D5DB;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.app-mobile {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  background: #F7F8FC;
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 430px) {
+  .app-shell {
+    background: #F7F8FC;
+  }
+  .app-mobile {
+    box-shadow: none;
+  }
+}
